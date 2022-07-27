@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat</title>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+    crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="./assets/main.css">
+</head>
+
+<body>
+  <form id="chat">
+    <input type="text" name="username" placeholder="Digite seu usuário">
+    <div class="messages"></div>
+    <input type="text" id="message" name="message" placeholder="Digite sua mensagem">
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script type="text/javascript">
+    const socket = new WebSocket('ws://localhost:3030/ws')
+
+    const connect = _ => {
+      socket.onmessage = msg => {
+        renderMessage(JSON.parse(msg.data))
+      }
+
+      socket.onclose = event => {
+        console.log('Socket closed connection')
+      }
+
+      socket.onerror = error => {
+        console.error("Socket error: " + error)
+      }
+    }
+
+    const renderMessage = message => {
+      $('.messages').append(`
+        <div class="message">
+          <strong> ${message.author} </strong>: <p> ${message.message} </p>
+        </div>
+      `)
+    }
+
+    const sendMsg = msg => {
+      const payload = JSON.stringify(msg)
+      socket.send(payload)
+    }
+
+    window.onload = _ => {
+      connect()
+    }
+
+    $('#chat').submit(event => {
+      event.preventDefault()
+
+      let author = $('input[name=username]').val()
+      let message = $('input[name=message]').val()
+      let inputMessage = document.getElementById('message')
+
+      if (author.length && message.length) {
+        let messageObject = {
+          author: author,
+          message: message
+        }
+        sendMsg(messageObject)
+      }
+
+      inputMessage.value = ''
+    })
+  </script>
+</body>
+
+</html>
