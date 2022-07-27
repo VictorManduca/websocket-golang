@@ -4,3 +4,14 @@
 
 ## Demo
 ![Demo](./assets/demo.gif)
+
+## Tech
+### Server
+* Golang
+* Gin
+* Melody
+
+### Client
+* HTML
+* CSS
+* Javascript
